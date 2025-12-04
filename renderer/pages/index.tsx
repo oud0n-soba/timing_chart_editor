@@ -37,6 +37,9 @@ const IndexPage = () => {
       <LinkButton href="/editor">
         NEW CREATE
       </LinkButton>
+      <LinkButton href="/chart">
+        CHART
+      </LinkButton>
       <ModalComponent buttonLabel="Open Modal" />
     </Layout>
   );

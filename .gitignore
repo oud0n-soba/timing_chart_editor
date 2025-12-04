@@ -4,3 +4,4 @@ node_modules
 renderer/.next
 main
 renderer/pages/editor
+node_modules
