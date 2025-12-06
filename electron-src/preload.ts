@@ -13,4 +13,6 @@ contextBridge.exposeInMainWorld("electron", {
   stopReceivingHello: (
     handler: (event: IpcRendererEvent, ...args: any[]) => void,
   ) => ipcRenderer.removeListener("message", handler),
+  saveJson: (data: any) => ipcRenderer.invoke("save-json", data),
+  loadJson: () => ipcRenderer.invoke("load-json"),
 });

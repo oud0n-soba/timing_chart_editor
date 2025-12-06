@@ -3,7 +3,7 @@ import { join } from "path";
 import { format } from "url";
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from "electron";
+import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog } from "electron";
 import isDev from "electron-is-dev";
 import prepareNext from "electron-next";
 
@@ -41,4 +41,46 @@ app.on("window-all-closed", app.quit);
 ipcMain.on("message", (event: IpcMainEvent, message: any) => {
   console.log(message);
   setTimeout(() => event.sender.send("message", "hi from electron"), 500);
+});
+
+// Save JSON handler
+ipcMain.handle("save-json", async (_event, data) => {
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    filters: [{ name: "JSON", extensions: ["json"] }],
+  });
+
+  if (canceled || !filePath) {
+    return { success: false };
+  }
+
+  try {
+    const fs = require("fs");
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to save file:", error);
+    return { success: false, error: (error as Error).message };
+  }
+});
+
+// Load JSON handler
+ipcMain.handle("load-json", async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    filters: [{ name: "JSON", extensions: ["json"] }],
+    properties: ["openFile"],
+  });
+
+  if (canceled || filePaths.length === 0) {
+    return { success: false };
+  }
+
+  try {
+    const fs = require("fs");
+    const content = fs.readFileSync(filePaths[0], "utf-8");
+    const data = JSON.parse(content);
+    return { success: true, data };
+  } catch (error) {
+    console.error("Failed to load file:", error);
+    return { success: false, error: (error as Error).message };
+  }
 });
