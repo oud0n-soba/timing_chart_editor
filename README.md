@@ -1,48 +1,133 @@
-# Electron with Typescript application example
+# Timing Chart Editor
 
-This example shows how to use Next.js inside an Electron application. To avoid a lot of configuration, we use Next.js as a router for pages, and use server rendering to speed up the initial render of the application. Both Next.js and Electron layers are written in TypeScript and compiled to JavaScript during the build process.
+[English](#english) | [日本語](#japanese)
 
-| Part       | Source code (Typescript) | Builds (JavaScript) |
-| ---------- | ------------------------ | ------------------- |
-| Next.js    | `/renderer`              | `/renderer`         |
-| Electron   | `/electron-src`          | `/main`             |
-| Production |                          | `/dist`             |
+<a name="english"></a>
 
-For development it's going to run a HTTP server and let Next.js handle routing. In production it will use `output: 'export'` to pre-generate HTML static files and use them in your app (instead of running a HTTP server).
+## 🇬🇧 English
 
-## How to use
+**Timing Chart Editor** is a desktop application designed for creating and editing timing charts efficiently. It is built using modern web technologies including Electron, Next.js, and TypeScript.
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+### Features
+
+- **Visual Editing**: Create timing charts with an intuitive graphical interface.
+- **Cross-Platform**: Runs on macOS and Windows.
+- **Modern Stack**: Built with React, Material UI, and Konva for high performance and responsiveness.
+
+### Tech Stack
+
+- **Electron**: Desktop application framework.
+- **Next.js**: React framework for the renderer process.
+- **TypeScript**: Static typing for better code quality.
+- **Rent-Konva**: Canvas library for drawing charts.
+- **Material UI**: UI component library.
+
+### Getting Started
+
+#### Prerequisites
+
+- Node.js (v18 or later recommended)
+- npm
+
+#### Installation
+
+Clone the repository and install dependencies:
 
 ```bash
-npx create-next-app --example with-electron-typescript with-electron-typescript-app
+git clone <repository-url>
+cd timing_chart_editor
+npm install
 ```
+
+#### Development
+
+To start the application in development mode with hot-reloading:
 
 ```bash
-yarn create next-app --example with-electron-typescript with-electron-typescript-app
+npm run dev
 ```
+
+#### Build & Distribution
+
+To build the application for production:
 
 ```bash
-pnpm create next-app --example with-electron-typescript with-electron-typescript-app
+# Build for current OS
+npm run build
+npm run dist
+
+# Build for Windows (x64)
+npm run build-win
 ```
 
-Available commands:
+### Project Structure
+
+- `electron-src/`: Main process code (Electron).
+- `renderer/`: Renderer process code (Next.js pages and components).
+- `renderer/pages/chart/`: Logic for the timing chart editor.
+
+---
+
+<a name="japanese"></a>
+
+## 🇯🇵 日本語
+
+**Timing Chart Editor** は、タイミングチャートを効率的に作成・編集するために設計されたデスクトップアプリケーションです。Electron、Next.js、TypeScript などの最新の Web 技術を使用して構築されています。
+
+### 特徴
+
+- **視覚的な編集**: 直感的なグラフィカルインターフェースでタイミングチャートを作成できます。
+- **クロスプラットフォーム**: macOS および Windows で動作します。
+- **モダンな技術スタック**: React、Material UI、Konva を採用し、高いパフォーマンスと応答性を実現しています。
+
+### 使用技術
+
+- **Electron**: デスクトップアプリケーションフレームワーク。
+- **Next.js**: レンダラープロセス用の React フレームワーク。
+- **TypeScript**: コード品質向上のための静的型付け。
+- **React-Konva**: チャート描画用の Canvas ライブラリ。
+- **Material UI**: UI コンポーネントライブラリ。
+
+### 始め方
+
+#### 前提条件
+
+- Node.js (v18 以降推奨)
+- npm
+
+#### インストール
+
+リポジトリをクローンし、依存関係をインストールします。
 
 ```bash
-"build-renderer": build and transpile Next.js layer
-"build-electron": transpile electron layer
-"build": build both layers
-"dev": start dev version
-"dist": create production electron build
-"type-check": check TypeScript in project
+git clone <repository-url>
+cd timing_chart_editor
+npm install
 ```
 
-## Notes
+#### 開発
 
-You can create the production app using `npm run dist`.
+開発モード（ホットリロード有効）でアプリケーションを起動するには：
 
-_note regarding types:_
+```bash
+npm run dev
+```
 
-- Electron provides its own type definitions, so you don't need @types/electron installed!
-  source: https://www.npmjs.com/package/@types/electron
-- There were no types available for `electron-next` at the time of creating this example, so until they are available there is a file `electron-next.d.ts` in `electron-src` directory.
+#### ビルドと配布
+
+本番用にアプリケーションをビルドするには：
+
+```bash
+# 現在の OS 向けにビルド
+npm run build
+npm run dist
+
+# Windows (x64) 向けにビルド
+npm run build-win
+```
+
+### プロジェクト構成
+
+- `electron-src/`: メインプロセスのコード (Electron)。
+- `renderer/`: レンダラープロセスのコード (Next.js のページとコンポーネント)。
+- `renderer/pages/chart/`: タイミングチャートエディタのロジック。

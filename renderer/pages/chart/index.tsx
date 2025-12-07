@@ -583,6 +583,7 @@ export default function ChartPage() {
     [1, 0, 1, 0, 1, 0, 1, ""],
     [0, 1, 0, 1, 0, 1, 0, ""],
     [1, 0, 1, 0, 1, 0, 1, ""],
+    [1, 0, 1, 0, 1, 0, 1, ""],
   ]);
 
   const chartHeight = CELL_HEIGHT * chartData.length;
@@ -611,7 +612,6 @@ export default function ChartPage() {
     if (!ctx) return;
 
     // Initial draw
-    drawName(ctx, nameData, chartWidth, chartHeight);
     drawName(ctx, nameData, chartWidth, chartHeight);
   }, [nameData, chartWidth, chartHeight]);
 
@@ -646,6 +646,90 @@ export default function ChartPage() {
       setSignalType(newSignalTypeData);
       setIsModalOpen(false);
       setEditingIndex(null);
+    }
+  };
+
+  const deleteSignal = () => {
+    if (editingIndex !== null) {
+      const newNameData = [...nameData];
+      const newSignalTypeData = [...signalType];
+      const newChartData = [...chartData];
+      newNameData.splice(editingIndex, 1);
+      newSignalTypeData.splice(editingIndex, 1);
+      newChartData.splice(editingIndex, 1);
+      setNameData(newNameData);
+      setSignalType(newSignalTypeData);
+      setChartData(newChartData);
+      setIsModalOpen(false);
+      setEditingIndex(null);
+    }
+  };
+
+  const addNewSignal = () => {
+    const newNameData = [...nameData];
+    const newSignalTypeData = [...signalType];
+    const newChartData = [...chartData];
+    newNameData.push("NEW_DATA");
+    newSignalTypeData.push("data");
+    newChartData.push([0]);
+    setNameData(newNameData);
+    setSignalType(newSignalTypeData);
+    setChartData(newChartData);
+    setIsModalOpen(false);
+    setEditingIndex(null);
+  };
+
+  const moveSignalUp = () => {
+    if (editingIndex !== null && editingIndex > 0) {
+      const newNameData = [...nameData];
+      const newSignalTypeData = [...signalType];
+      const newChartData = [...chartData];
+
+      // Swap with index - 1
+      [newNameData[editingIndex], newNameData[editingIndex - 1]] = [
+        newNameData[editingIndex - 1],
+        newNameData[editingIndex],
+      ];
+      [newSignalTypeData[editingIndex], newSignalTypeData[editingIndex - 1]] = [
+        newSignalTypeData[editingIndex - 1],
+        newSignalTypeData[editingIndex],
+      ];
+      [newChartData[editingIndex], newChartData[editingIndex - 1]] = [
+        newChartData[editingIndex - 1],
+        newChartData[editingIndex],
+      ];
+
+      setNameData(newNameData);
+      setSignalType(newSignalTypeData);
+      setChartData(newChartData);
+      setEditingIndex(editingIndex - 1);
+    }
+  };
+
+  const moveSignalDown = () => {
+    if (editingIndex !== null && editingIndex < nameData.length - 1) {
+      const newNameData = [...nameData];
+      const newSignalTypeData = [...signalType];
+      const newChartData = [...chartData];
+
+      // Swap with index + 1
+      [newNameData[editingIndex], newNameData[editingIndex + 1]] = [
+        newNameData[editingIndex + 1],
+        newNameData[editingIndex],
+      ];
+      [newSignalTypeData[editingIndex], newSignalTypeData[editingIndex + 1]] = [
+        newSignalTypeData[editingIndex + 1],
+        newSignalTypeData[editingIndex],
+      ];
+      [newChartData[editingIndex], newChartData[editingIndex + 1]] = [
+        newChartData[editingIndex + 1],
+        newChartData[editingIndex],
+      ];
+
+      setNameData(newNameData);
+      setSignalType(newSignalTypeData);
+      setChartData(newChartData);
+      setEditingIndex(editingIndex + 1);
     }
   };
 
@@ -823,6 +907,19 @@ export default function ChartPage() {
             />
           </div>
         </div>
+        <button
+          onClick={addNewSignal}
+          style={{
+            padding: "8px 16px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            backgroundColor: "#fe5884ff",
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          Add New Signal
+        </button>
       </div>
       {isModalOpen && (
         <div
@@ -849,20 +946,53 @@ export default function ChartPage() {
             }}
           >
             <h3 style={{ marginTop: 0 }}>Edit Signal Name</h3>
-            <input
-              type="text"
-              value={editingNameValue}
-              onChange={(e) => setNameEditingValue(e.target.value)}
+            <div
               style={{
-                width: "100%",
-                padding: "8px",
+                display: "flex",
+                alignItems: "center",
                 marginBottom: "16px",
-                boxSizing: "border-box",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
               }}
-              autoFocus
-            />
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginRight: "8px",
+                }}
+              >
+                <button
+                  onClick={moveSignalUp}
+                  disabled={editingIndex === 0}
+                  style={{
+                    marginBottom: "2px",
+                    cursor: "pointer",
+                    padding: "2px 6px",
+                  }}
+                >
+                  ▲
+                </button>
+                <button
+                  onClick={moveSignalDown}
+                  disabled={editingIndex === nameData.length - 1}
+                  style={{ cursor: "pointer", padding: "2px 6px" }}
+                >
+                  ▼
+                </button>
+              </div>
+              <input
+                type="text"
+                value={editingNameValue}
+                onChange={(e) => setNameEditingValue(e.target.value)}
+                style={{
+                  flexGrow: 1,
+                  padding: "8px",
+                  boxSizing: "border-box",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                }}
+                autoFocus
+              />
+            </div>
 
             <h3 style={{ marginTop: 0 }}>Edit Signal Type</h3>
             <select
@@ -889,6 +1019,19 @@ export default function ChartPage() {
                 gap: "8px",
               }}
             >
+              <button
+                onClick={deleteSignal}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "4px",
+                  border: "none",
+                  backgroundColor: "#ff0051ff",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Delete Signal
+              </button>
               <button
                 onClick={cancelEdit}
                 style={{
