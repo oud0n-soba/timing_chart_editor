@@ -2,14 +2,31 @@ import React, { useEffect, useRef, useState } from "react";
 import Layout from "../../components/Layout";
 import { NextPage } from "next/types";
 
-const CELL_WIDTH = 20;
-const CELL_HEIGHT = 40;
+import { CELL_HEIGHT, CELL_WIDTH } from "../../utils/chart/variable";
+import {
+  drawClockCell0,
+  drawClockCell1,
+  drawClockCellx,
+} from "../../utils/chart/drawClock";
 
-type ChartData = 0 | 1 | "x" | "";
-type NameData = string;
-type SignalType = "clock" | "data" | "busData";
+import {
+  drawDataCell0to1,
+  drawDataCell0to0,
+  drawDataCell0tox,
+  drawDataCellxto0,
+  drawDataCell1to0,
+  drawDataCell1to1,
+  drawDataCell1tox,
+  drawDataCellxto1,
+  drawDataCellxtox,
+} from "../../utils/chart/drawData";
+import { WidthNormal } from "@mui/icons-material";
 
-let patternSource: HTMLCanvasElement | null = null;
+// type ChartData = 0 | 1 | "x" | "";
+// type NameData = string;
+// type SignalType = "clock" | "data" | "busData";
+
+// let patternSource: HTMLCanvasElement | null = null;
 
 const getLongestRowIndex = (data: ChartData[][]): number => {
   return data.reduce(
@@ -23,436 +40,6 @@ const getLongestNameIndex = (data: NameData[]): number => {
     (maxIdx, row, idx, arr) => (row.length > arr[maxIdx].length ? idx : maxIdx),
     0
   );
-};
-
-const drawDataCell0to1 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-
-  // ctx.beginPath();
-  // ctx.moveTo(x, y + 5);
-  // ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  // ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  // ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-  // ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(x, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.lineTo(x + CELL_WIDTH, y + 5);
-  ctx.stroke();
-};
-
-const drawDataCell0to0 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(x, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-  ctx.stroke();
-};
-
-const drawDataCell0tox = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.stroke();
-
-  ctx.strokeStyle = "#ff55ff";
-  ctx.lineWidth = 2;
-
-  ctx.beginPath();
-  ctx.setLineDash([2, 2]);
-  ctx.moveTo(x + CELL_WIDTH, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-
-  // 斜線パターンの作成と塗りつぶし
-  if (!patternSource) {
-    patternSource = document.createElement("canvas");
-    patternSource.width = 10;
-    patternSource.height = 10;
-    const pCtx = patternSource.getContext("2d");
-    if (pCtx) {
-      pCtx.strokeStyle = "#ff55ff";
-      pCtx.lineWidth = 1;
-      pCtx.beginPath();
-      // 左下から右上への斜線
-      pCtx.moveTo(0, 10);
-      pCtx.lineTo(10, 0);
-      pCtx.stroke();
-    }
-  }
-
-  const pattern = ctx.createPattern(patternSource, "repeat");
-  if (pattern) {
-    ctx.fillStyle = pattern;
-    ctx.fill();
-  }
-
-  ctx.stroke();
-};
-
-const drawDataCellxto0 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#ff55ff";
-  ctx.lineWidth = 2;
-
-  ctx.beginPath();
-  ctx.setLineDash([2, 2]);
-  ctx.moveTo(x, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x, y + CELL_HEIGHT - 5);
-
-  // 斜線パターンの作成と塗りつぶし
-  if (!patternSource) {
-    patternSource = document.createElement("canvas");
-    patternSource.width = 10;
-    patternSource.height = 10;
-    const pCtx = patternSource.getContext("2d");
-    if (pCtx) {
-      pCtx.strokeStyle = "#ff55ff";
-      pCtx.lineWidth = 1;
-      pCtx.beginPath();
-      // 左下から右上への斜線
-      pCtx.moveTo(0, 10);
-      pCtx.lineTo(10, 0);
-      pCtx.stroke();
-    }
-  }
-
-  const pattern = ctx.createPattern(patternSource, "repeat");
-  if (pattern) {
-    ctx.fillStyle = pattern;
-    ctx.fill();
-  }
-
-  ctx.stroke();
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.setLineDash([]);
-  ctx.moveTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-
-  ctx.stroke();
-};
-
-const drawDataCell1to0 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-  ctx.stroke();
-};
-
-const drawDataCell1to1 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y + 5);
-  ctx.lineTo(x + CELL_WIDTH, y + 5);
-  ctx.stroke();
-};
-
-const drawDataCell1tox = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.stroke();
-
-  ctx.strokeStyle = "#ff55ff";
-  ctx.lineWidth = 2;
-
-  ctx.beginPath();
-  ctx.setLineDash([2, 2]);
-  ctx.moveTo(x + CELL_WIDTH, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-
-  // 斜線パターンの作成と塗りつぶし
-  if (!patternSource) {
-    patternSource = document.createElement("canvas");
-    patternSource.width = 10;
-    patternSource.height = 10;
-    const pCtx = patternSource.getContext("2d");
-    if (pCtx) {
-      pCtx.strokeStyle = "#ff55ff";
-      pCtx.lineWidth = 1;
-      pCtx.beginPath();
-      // 左下から右上への斜線
-      pCtx.moveTo(0, 10);
-      pCtx.lineTo(10, 0);
-      pCtx.stroke();
-    }
-  }
-
-  const pattern = ctx.createPattern(patternSource, "repeat");
-  if (pattern) {
-    ctx.fillStyle = pattern;
-    ctx.fill();
-  }
-
-  ctx.stroke();
-};
-
-const drawDataCellxto1 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#ff55ff";
-  ctx.lineWidth = 2;
-
-  ctx.beginPath();
-  ctx.setLineDash([2, 2]);
-  ctx.moveTo(x, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.lineTo(x + CELL_WIDTH / 2, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x, y + CELL_HEIGHT - 5);
-
-  // 斜線パターンの作成と塗りつぶし
-  if (!patternSource) {
-    patternSource = document.createElement("canvas");
-    patternSource.width = 10;
-    patternSource.height = 10;
-    const pCtx = patternSource.getContext("2d");
-    if (pCtx) {
-      pCtx.strokeStyle = "#ff55ff";
-      pCtx.lineWidth = 1;
-      pCtx.beginPath();
-      // 左下から右上への斜線
-      pCtx.moveTo(0, 10);
-      pCtx.lineTo(10, 0);
-      pCtx.stroke();
-    }
-  }
-
-  const pattern = ctx.createPattern(patternSource, "repeat");
-  if (pattern) {
-    ctx.fillStyle = pattern;
-    ctx.fill();
-  }
-
-  ctx.stroke();
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.setLineDash([]);
-  ctx.moveTo(x + CELL_WIDTH / 2, y + 5);
-  ctx.lineTo(x + CELL_WIDTH, y + 5);
-
-  ctx.stroke();
-};
-
-const drawDataCellxtox = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  // 斜線パターンの作成
-  if (!patternSource) {
-    patternSource = document.createElement("canvas");
-    patternSource.width = 10;
-    patternSource.height = 10;
-    const pCtx = patternSource.getContext("2d");
-    if (pCtx) {
-      pCtx.strokeStyle = "#ff55ff";
-      pCtx.lineWidth = 1;
-      pCtx.beginPath();
-      // 左下から右上への斜線
-      pCtx.moveTo(0, 10);
-      pCtx.lineTo(10, 0);
-      pCtx.stroke();
-    }
-  }
-
-  // 塗りつぶし
-  const pattern = ctx.createPattern(patternSource, "repeat");
-  if (pattern) {
-    ctx.fillStyle = pattern;
-    ctx.beginPath();
-    ctx.rect(x, y + 5, CELL_WIDTH, CELL_HEIGHT - 10);
-    ctx.fill();
-  }
-
-  // 枠線の描画
-  ctx.strokeStyle = "#ff55ff";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.setLineDash([2, 2]);
-  ctx.moveTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x, y + CELL_HEIGHT - 5);
-  ctx.moveTo(x, y + 5);
-  ctx.lineTo(x + CELL_WIDTH, y + 5);
-  ctx.stroke();
-};
-
-const drawClockCell0 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-  ctx.stroke();
-};
-
-const drawClockCell1 = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  ctx.strokeStyle = "#0055ff";
-  ctx.setLineDash([]);
-  ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH / 4, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH / 4, y + 5);
-  ctx.lineTo(x + (CELL_WIDTH / 4) * 3, y + 5);
-  ctx.lineTo(x + (CELL_WIDTH / 4) * 3, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-  ctx.stroke();
-};
-
-const drawClockCellx = (
-  ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
-) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
-
-  // 斜線パターンの作成
-  if (!patternSource) {
-    patternSource = document.createElement("canvas");
-    patternSource.width = 10;
-    patternSource.height = 10;
-    const pCtx = patternSource.getContext("2d");
-    if (pCtx) {
-      pCtx.strokeStyle = "#ff55ff";
-      pCtx.lineWidth = 1;
-      pCtx.beginPath();
-      // 左下から右上への斜線
-      pCtx.moveTo(0, 10);
-      pCtx.lineTo(10, 0);
-      pCtx.stroke();
-    }
-  }
-
-  // 塗りつぶし
-  const pattern = ctx.createPattern(patternSource, "repeat");
-  if (pattern) {
-    ctx.fillStyle = pattern;
-    ctx.beginPath();
-    ctx.rect(x, y + 5, CELL_WIDTH, CELL_HEIGHT - 10);
-    ctx.fill();
-  }
-
-  // 枠線の描画
-  ctx.strokeStyle = "#ff55ff";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.setLineDash([2, 2]);
-  ctx.moveTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x, y + CELL_HEIGHT - 5);
-  ctx.lineTo(x, y + 5);
-  ctx.lineTo(x + CELL_WIDTH, y + 5);
-  ctx.lineTo(x + CELL_WIDTH, y + CELL_HEIGHT - 5);
-
-  ctx.stroke();
 };
 
 const drawGrid = (
@@ -490,9 +77,54 @@ const drawName = (
 
   ctx.font = "16px sans-serif";
   ctx.fillStyle = "#000";
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
 
   for (let i = 0; i < nameData.length; i++) {
-    ctx.fillText(nameData[i], 0, i * CELL_HEIGHT + CELL_HEIGHT / 2);
+    ctx.fillText(nameData[i], 5, i * CELL_HEIGHT + CELL_HEIGHT / 2);
+  }
+};
+
+const drawScale = (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  widthStart: number,
+  scale: number
+) => {
+  ctx.clearRect(0, 0, width, height);
+
+  ctx.font = "10px sans-serif";
+  ctx.fillStyle = "#000";
+  // ctx.strokeStyle = "#e0e0e0";
+  ctx.strokeStyle = "#ec3f3fff";
+  ctx.lineWidth = 0.8;
+
+  for (let i = 0; i <= (width - widthStart) / CELL_WIDTH; i++) {
+    if (i < (width - widthStart) / CELL_WIDTH - 1) {
+      // ctx.fillText(
+      //   (i * scale).toString(),
+      //   i * CELL_WIDTH + widthStart,
+      //   height,
+      //   CELL_WIDTH - 2
+      // );
+
+      ctx.save();
+      ctx.translate(i * CELL_WIDTH + widthStart, height);
+      // ctx.rotate(Math.PI / 2);
+      ctx.rotate(-Math.PI / 2);
+      // ctx.textAlign = "right";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      // ctx.fillText((i * scale).toString(), -2, 0);
+      ctx.fillText((i * scale).toString(), 2, 0);
+      ctx.restore();
+
+      // ctx.beginPath();
+      // ctx.moveTo(i * CELL_WIDTH + widthStart, 0);
+      // ctx.lineTo(i * CELL_WIDTH + widthStart, height);
+      // ctx.stroke();
+    }
   }
 };
 
@@ -551,6 +183,7 @@ const drawChart = (
 export default function ChartPage() {
   const nameCanvasRef = useRef<HTMLCanvasElement>(null);
   const chartCanvasRef = useRef<HTMLCanvasElement>(null);
+  const scaleCanvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState("マス目をクリックしてください");
   const [nameData, setNameData] = useState<NameData[]>([
     "RESET",
@@ -563,6 +196,7 @@ export default function ChartPage() {
     "DATA5",
     "DATA6",
   ]);
+
   const [signalType, setSignalType] = useState<SignalType[]>([
     "data",
     "clock",
@@ -574,6 +208,7 @@ export default function ChartPage() {
     "data",
     "data",
   ]);
+
   const [chartData, setChartData] = useState<ChartData[][]>([
     [1, 1, 1, 0, 0, 0, 1, ""],
     [0, 0, 1, 1, 1, 1, 1, ""],
@@ -586,12 +221,18 @@ export default function ChartPage() {
     [1, 0, 1, 0, 1, 0, 1, ""],
   ]);
 
+  const [period, setPeriod] = useState<number>(40);
+
   const chartHeight = CELL_HEIGHT * chartData.length;
   const chartWidth =
     CELL_WIDTH * chartData[getLongestRowIndex(chartData)].length;
 
   const nameHeight = CELL_HEIGHT * chartData.length;
-  const nameWidth = CELL_WIDTH * nameData[getLongestNameIndex(nameData)].length;
+  const nameWidth =
+    CELL_WIDTH * nameData[getLongestNameIndex(nameData)].length + 2;
+
+  const scaleHeight = CELL_HEIGHT;
+  const scaleWidth = nameWidth + chartWidth + 1;
 
   useEffect(() => {
     const canvas = chartCanvasRef.current;
@@ -615,7 +256,19 @@ export default function ChartPage() {
     drawName(ctx, nameData, chartWidth, chartHeight);
   }, [nameData, chartWidth, chartHeight]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  useEffect(() => {
+    const canvas = scaleCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Initial draw
+    drawScale(ctx, scaleWidth, scaleHeight, nameWidth, period);
+  }, [chartData, nameData, period]);
+
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [isScaleModalOpen, setIsScaleModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNameValue, setNameEditingValue] = useState<NameData>("");
   const [editingSignalTypeValue, setEditingSignalTypeValue] =
@@ -632,11 +285,15 @@ export default function ChartPage() {
       setEditingIndex(row);
       setNameEditingValue(nameData[row]);
       setEditingSignalTypeValue(signalType[row]);
-      setIsModalOpen(true);
+      setIsNameModalOpen(true);
     }
   };
 
-  const saveEdit = () => {
+  const handleScaleMouseDown = () => {
+    setIsScaleModalOpen(true);
+  };
+
+  const saveNameEdit = () => {
     if (editingIndex !== null) {
       const newNameData = [...nameData];
       const newSignalTypeData = [...signalType];
@@ -644,7 +301,7 @@ export default function ChartPage() {
       newSignalTypeData[editingIndex] = editingSignalTypeValue;
       setNameData(newNameData);
       setSignalType(newSignalTypeData);
-      setIsModalOpen(false);
+      setIsNameModalOpen(false);
       setEditingIndex(null);
     }
   };
@@ -660,7 +317,7 @@ export default function ChartPage() {
       setNameData(newNameData);
       setSignalType(newSignalTypeData);
       setChartData(newChartData);
-      setIsModalOpen(false);
+      setIsNameModalOpen(false);
       setEditingIndex(null);
     }
   };
@@ -675,7 +332,7 @@ export default function ChartPage() {
     setNameData(newNameData);
     setSignalType(newSignalTypeData);
     setChartData(newChartData);
-    setIsModalOpen(false);
+    setIsNameModalOpen(false);
     setEditingIndex(null);
   };
 
@@ -733,9 +390,17 @@ export default function ChartPage() {
     }
   };
 
-  const cancelEdit = () => {
-    setIsModalOpen(false);
+  const cancelNameEdit = () => {
+    setIsNameModalOpen(false);
     setEditingIndex(null);
+  };
+
+  const saveScaleEdit = (period: number) => {
+    setIsScaleModalOpen(false);
+  };
+
+  const cancelScaleEdit = () => {
+    setIsScaleModalOpen(false);
   };
 
   const handleChartMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -873,19 +538,40 @@ export default function ChartPage() {
         </div>
         <div
           style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "left",
+            display: "grid",
+            gridTemplateColumns: "max-content 2fr",
+            gridTemplateRows: "max-content 2fr",
+            alignItems: "start",
             padding: "20px",
             fontFamily: "sans-serif",
             backgroundColor: "#f0f0f0",
             width: "100%",
-            // overflowX: "scroll",
-            // overflowY: "hidden",
-            // minHeight: "calc(100vh - 64px)", // Adjust for layout header if needed
           }}
         >
-          <div style={{ overflowX: "hidden", overflowY: "hidden" }}>
+          <div />
+          <div
+            style={{
+              overflowX: "hidden",
+              overflowY: "hidden",
+              gridColumn: "1 / 3",
+              gridRow: "1 / 2",
+            }}
+          >
+            <canvas
+              ref={scaleCanvasRef}
+              width={scaleWidth}
+              height={scaleHeight}
+              onMouseDown={handleScaleMouseDown}
+            />
+          </div>
+          <div
+            style={{
+              overflowX: "hidden",
+              overflowY: "hidden",
+              gridColumn: "1 / 2",
+              gridRow: "2 / 3",
+            }}
+          >
             <canvas
               ref={nameCanvasRef}
               width={nameWidth}
@@ -893,7 +579,14 @@ export default function ChartPage() {
               onMouseDown={handleNameMouseDown}
             />
           </div>
-          <div style={{ overflowX: "scroll", overflowY: "hidden" }}>
+          <div
+            style={{
+              overflowX: "scroll",
+              overflowY: "hidden",
+              gridColumn: "2 / 3",
+              gridRow: "2 / 3",
+            }}
+          >
             <canvas
               ref={chartCanvasRef}
               width={chartWidth}
@@ -921,7 +614,7 @@ export default function ChartPage() {
           Add New Signal
         </button>
       </div>
-      {isModalOpen && (
+      {isNameModalOpen && (
         <div
           style={{
             position: "fixed",
@@ -1033,7 +726,7 @@ export default function ChartPage() {
                 Delete Signal
               </button>
               <button
-                onClick={cancelEdit}
+                onClick={cancelNameEdit}
                 style={{
                   padding: "8px 16px",
                   borderRadius: "4px",
@@ -1045,7 +738,91 @@ export default function ChartPage() {
                 Cancel
               </button>
               <button
-                onClick={saveEdit}
+                onClick={saveNameEdit}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "4px",
+                  border: "none",
+                  backgroundColor: "#007bff",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isScaleModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              minWidth: "300px",
+            }}
+          >
+            <h3 style={{ marginTop: 0 }}>Edit Signal Name</h3>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "16px",
+              }}
+            >
+              <input
+                type="number"
+                min={1}
+                step={1}
+                value={period}
+                onChange={(e) => setPeriod(Number(e.target.value))}
+                style={{
+                  flexGrow: 1,
+                  padding: "8px",
+                  boxSizing: "border-box",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                }}
+                autoFocus
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "8px",
+              }}
+            >
+              <button
+                onClick={cancelScaleEdit}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                  backgroundColor: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveScaleEdit}
                 style={{
                   padding: "8px 16px",
                   borderRadius: "4px",

@@ -20,12 +20,6 @@
       "@/interfaces/*": ["interfaces/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "../next.config.js",
-    "../old/context.tsx"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "../next.config.js"],
   "exclude": ["node_modules"]
 }
