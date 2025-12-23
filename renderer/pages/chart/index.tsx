@@ -352,6 +352,77 @@ export default function ChartPage() {
       >
         <div
           style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            width: "100%",
+            marginBottom: "10px",
+            padding: "0 10px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "white",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                padding: "5px 10px",
+              }}
+            >
+              <span style={{ marginRight: "5px" }}>Step:</span>
+              <input
+                type="number"
+                value={period}
+                onChange={(e) => setPeriod(Number(e.target.value))}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  width: "50px",
+                  fontSize: "14px",
+                  textAlign: "right",
+                }}
+              />
+            </div>
+            <button
+              onClick={() => setPeriod((p) => p + 10)}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                border: "1px solid #ccc",
+                backgroundColor: "white",
+                fontSize: "20px",
+                cursor: "pointer",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              +
+            </button>
+            <button
+              onClick={() => setPeriod((p) => Math.max(10, p - 10))}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                border: "1px solid #ccc",
+                backgroundColor: "white",
+                fontSize: "20px",
+                cursor: "pointer",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              -
+            </button>
+          </div>
+        </div>
+        <div
+          style={{
             display: "grid",
             gridTemplateColumns: "max-content 2fr",
             gridTemplateRows: "max-content 2fr",
