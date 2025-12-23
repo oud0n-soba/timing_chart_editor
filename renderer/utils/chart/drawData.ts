@@ -4,11 +4,9 @@ let patternSource: HTMLCanvasElement | null = null;
 
 export const drawDataCell0to1 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -31,11 +29,9 @@ export const drawDataCell0to1 = (
 
 export const drawDataCell0to0 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -48,11 +44,9 @@ export const drawDataCell0to0 = (
 
 export const drawDataCell0tox = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -101,11 +95,9 @@ export const drawDataCell0tox = (
 
 export const drawDataCellxto0 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#ff55ff";
   ctx.lineWidth = 2;
@@ -155,11 +147,9 @@ export const drawDataCellxto0 = (
 
 export const drawDataCell1to0 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -175,11 +165,9 @@ export const drawDataCell1to0 = (
 
 export const drawDataCell1to1 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -193,11 +181,9 @@ export const drawDataCell1to1 = (
 
 export const drawDataCell1tox = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -246,11 +232,9 @@ export const drawDataCell1tox = (
 
 export const drawDataCellxto1 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#ff55ff";
   ctx.lineWidth = 2;
@@ -300,11 +284,9 @@ export const drawDataCellxto1 = (
 
 export const drawDataCellxtox = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   // 斜線パターンの作成
   if (!patternSource) {

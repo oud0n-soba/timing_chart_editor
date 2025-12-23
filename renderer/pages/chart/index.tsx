@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import Layout from "../../components/Layout";
+// import Layout from "../../components/Layout";
+import Layout from "./Layout";
 import { NextPage } from "next/types";
+import { NameModal } from "../../utils/chart/NameModal";
 
 import { CELL_HEIGHT, CELL_WIDTH } from "../../utils/chart/variable";
 import {
@@ -20,13 +22,6 @@ import {
   drawDataCellxto1,
   drawDataCellxtox,
 } from "../../utils/chart/drawData";
-import { WidthNormal } from "@mui/icons-material";
-
-// type ChartData = 0 | 1 | "x" | "";
-// type NameData = string;
-// type SignalType = "clock" | "data" | "busData";
-
-// let patternSource: HTMLCanvasElement | null = null;
 
 const getLongestRowIndex = (data: ChartData[][]): number => {
   return data.reduce(
@@ -60,6 +55,14 @@ const drawGrid = (
   }
 
   for (let y = 0; y <= height; y += CELL_HEIGHT) {
+    if (CELL_HEIGHT === y) {
+      ctx.strokeStyle = "#b9b3b3ff";
+      ctx.lineWidth = 2;
+    } else {
+      ctx.strokeStyle = "#e0e0e0";
+      ctx.lineWidth = 1;
+    }
+
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(width, y);
@@ -70,18 +73,19 @@ const drawGrid = (
 const drawName = (
   ctx: CanvasRenderingContext2D,
   nameData: string[],
+  currentY: number,
   width: number,
   height: number
 ) => {
   ctx.clearRect(0, 0, width, height);
 
-  ctx.font = "16px sans-serif";
+  ctx.font = "14px SourceHanCodeJP-Normal";
   ctx.fillStyle = "#000";
   ctx.textBaseline = "middle";
   ctx.textAlign = "left";
 
   for (let i = 0; i < nameData.length; i++) {
-    ctx.fillText(nameData[i], 5, i * CELL_HEIGHT + CELL_HEIGHT / 2);
+    ctx.fillText(nameData[i], 5, i * CELL_HEIGHT + CELL_HEIGHT / 2 + currentY);
   }
 };
 
@@ -89,41 +93,24 @@ const drawScale = (
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  widthStart: number,
-  scale: number
+  period: number
 ) => {
-  ctx.clearRect(0, 0, width, height);
+  // ctx.clearRect(0, 0, width, height);
 
-  ctx.font = "10px sans-serif";
+  ctx.font = "10px SourceHanCodeJP-Normal";
   ctx.fillStyle = "#000";
   // ctx.strokeStyle = "#e0e0e0";
-  ctx.strokeStyle = "#ec3f3fff";
-  ctx.lineWidth = 0.8;
+  // ctx.strokeStyle = "#ec3f3fff";
+  // ctx.lineWidth = 0.8;
 
-  for (let i = 0; i <= (width - widthStart) / CELL_WIDTH; i++) {
-    if (i < (width - widthStart) / CELL_WIDTH - 1) {
-      // ctx.fillText(
-      //   (i * scale).toString(),
-      //   i * CELL_WIDTH + widthStart,
-      //   height,
-      //   CELL_WIDTH - 2
-      // );
-
-      ctx.save();
-      ctx.translate(i * CELL_WIDTH + widthStart, height);
-      // ctx.rotate(Math.PI / 2);
-      ctx.rotate(-Math.PI / 2);
-      // ctx.textAlign = "right";
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-      // ctx.fillText((i * scale).toString(), -2, 0);
-      ctx.fillText((i * scale).toString(), 2, 0);
-      ctx.restore();
-
-      // ctx.beginPath();
-      // ctx.moveTo(i * CELL_WIDTH + widthStart, 0);
-      // ctx.lineTo(i * CELL_WIDTH + widthStart, height);
-      // ctx.stroke();
+  for (let i = 0; i <= width / CELL_WIDTH; i++) {
+    if (i < width / CELL_WIDTH) {
+      ctx.fillText(
+        (i * period).toString(),
+        i * CELL_WIDTH + 2,
+        height - 5,
+        CELL_WIDTH - 2
+      );
     }
   }
 };
@@ -132,47 +119,54 @@ const drawChart = (
   ctx: CanvasRenderingContext2D,
   chartData: ChartData[][],
   signalType: SignalType[],
-  width: number,
-  height: number
+  currentY: number
+  // width: number,
+  // height: number
 ) => {
-  drawGrid(ctx, width, height);
+  // drawGrid(ctx, width, height);
 
-  for (let i = 0; i < chartData.length; i++) {
+  for (let i = 0; i <= chartData.length; i++) {
+    const y = i * CELL_HEIGHT + currentY;
+
     if ("clock" == signalType[i]) {
       for (let j = 0; j < chartData[i].length; j++) {
+        const x = j * CELL_WIDTH;
+
         if (0 === chartData[i][j]) {
-          drawClockCell0(ctx, j, i);
+          drawClockCell0(ctx, x, y);
         } else if (1 === chartData[i][j]) {
-          drawClockCell1(ctx, j, i);
+          drawClockCell1(ctx, x, y);
         } else if ("x" === chartData[i][j]) {
-          drawClockCellx(ctx, j, i);
+          drawClockCellx(ctx, x, y);
         }
       }
     } else if ("data" == signalType[i]) {
       for (let j = 0; j < chartData[i].length; j++) {
+        const x = j * CELL_WIDTH;
+
         if (0 === chartData[i][j]) {
           if (0 === j || "x" === chartData[i][j - 1]) {
-            drawDataCellxto0(ctx, j, i);
+            drawDataCellxto0(ctx, x, y);
           } else if (0 === chartData[i][j - 1]) {
-            drawDataCell0to0(ctx, j, i);
+            drawDataCell0to0(ctx, x, y);
           } else if (1 === chartData[i][j - 1]) {
-            drawDataCell1to0(ctx, j, i);
+            drawDataCell1to0(ctx, x, y);
           }
         } else if (1 === chartData[i][j]) {
           if (0 === j || "x" === chartData[i][j - 1]) {
-            drawDataCellxto1(ctx, j, i);
+            drawDataCellxto1(ctx, x, y);
           } else if (0 === chartData[i][j - 1]) {
-            drawDataCell0to1(ctx, j, i);
+            drawDataCell0to1(ctx, x, y);
           } else if (1 === chartData[i][j - 1]) {
-            drawDataCell1to1(ctx, j, i);
+            drawDataCell1to1(ctx, x, y);
           }
         } else if ("x" === chartData[i][j]) {
           if (0 === j || "x" === chartData[i][j - 1]) {
-            drawDataCellxtox(ctx, j, i);
+            drawDataCellxtox(ctx, x, y);
           } else if (0 === chartData[i][j - 1]) {
-            drawDataCell0tox(ctx, j, i);
+            drawDataCell0tox(ctx, x, y);
           } else if (1 === chartData[i][j - 1]) {
-            drawDataCell1tox(ctx, j, i);
+            drawDataCell1tox(ctx, x, y);
           }
         }
       }
@@ -223,16 +217,13 @@ export default function ChartPage() {
 
   const [period, setPeriod] = useState<number>(40);
 
-  const chartHeight = CELL_HEIGHT * chartData.length;
+  const tmpnameWidth = 10 * nameData[getLongestNameIndex(nameData)].length + 10;
+  const nameWidth = tmpnameWidth < 100 ? 100 : tmpnameWidth;
+
   const chartWidth =
     CELL_WIDTH * chartData[getLongestRowIndex(chartData)].length;
 
-  const nameHeight = CELL_HEIGHT * chartData.length;
-  const nameWidth =
-    CELL_WIDTH * nameData[getLongestNameIndex(nameData)].length + 2;
-
-  const scaleHeight = CELL_HEIGHT;
-  const scaleWidth = nameWidth + chartWidth + 1;
+  const chartHeight = CELL_HEIGHT * chartData.length + CELL_HEIGHT;
 
   useEffect(() => {
     const canvas = chartCanvasRef.current;
@@ -241,9 +232,17 @@ export default function ChartPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Initial draw
-    drawChart(ctx, chartData, signalType, chartWidth, chartHeight);
-  }, [chartData, signalType, chartWidth, chartHeight]);
+    const render = () => {
+      // Initial draw
+      drawGrid(ctx, chartWidth, chartHeight);
+      // drawChart(ctx, chartData, signalType, CELL_HEIGHT, chartWidth, chartHeight);
+      drawScale(ctx, chartWidth, CELL_HEIGHT, period);
+      drawChart(ctx, chartData, signalType, CELL_HEIGHT);
+    };
+
+    // render();
+    document.fonts.ready.then(render);
+  }, [chartData, nameData, period, signalType, chartWidth, chartHeight]);
 
   useEffect(() => {
     const canvas = nameCanvasRef.current;
@@ -252,23 +251,15 @@ export default function ChartPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Initial draw
-    drawName(ctx, nameData, chartWidth, chartHeight);
-  }, [nameData, chartWidth, chartHeight]);
+    const render = () => {
+      drawName(ctx, nameData, CELL_HEIGHT, nameWidth, chartHeight);
+    };
 
-  useEffect(() => {
-    const canvas = scaleCanvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Initial draw
-    drawScale(ctx, scaleWidth, scaleHeight, nameWidth, period);
-  }, [chartData, nameData, period]);
+    // render();
+    document.fonts.ready.then(render);
+  }, [nameData, nameWidth, chartHeight]);
 
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
-  const [isScaleModalOpen, setIsScaleModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNameValue, setNameEditingValue] = useState<NameData>("");
   const [editingSignalTypeValue, setEditingSignalTypeValue] =
@@ -279,46 +270,16 @@ export default function ChartPage() {
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const mouseY = event.clientY - rect.top;
-    const row = Math.floor(mouseY / CELL_HEIGHT);
+    const row = Math.floor((mouseY - CELL_HEIGHT) / CELL_HEIGHT);
+
+    // TODO: out of bounds : chart folding
+    if (row < 0 || row >= nameData.length) return;
 
     if (row >= 0 && row < nameData.length) {
       setEditingIndex(row);
       setNameEditingValue(nameData[row]);
       setEditingSignalTypeValue(signalType[row]);
       setIsNameModalOpen(true);
-    }
-  };
-
-  const handleScaleMouseDown = () => {
-    setIsScaleModalOpen(true);
-  };
-
-  const saveNameEdit = () => {
-    if (editingIndex !== null) {
-      const newNameData = [...nameData];
-      const newSignalTypeData = [...signalType];
-      newNameData[editingIndex] = editingNameValue;
-      newSignalTypeData[editingIndex] = editingSignalTypeValue;
-      setNameData(newNameData);
-      setSignalType(newSignalTypeData);
-      setIsNameModalOpen(false);
-      setEditingIndex(null);
-    }
-  };
-
-  const deleteSignal = () => {
-    if (editingIndex !== null) {
-      const newNameData = [...nameData];
-      const newSignalTypeData = [...signalType];
-      const newChartData = [...chartData];
-      newNameData.splice(editingIndex, 1);
-      newSignalTypeData.splice(editingIndex, 1);
-      newChartData.splice(editingIndex, 1);
-      setNameData(newNameData);
-      setSignalType(newSignalTypeData);
-      setChartData(newChartData);
-      setIsNameModalOpen(false);
-      setEditingIndex(null);
     }
   };
 
@@ -336,73 +297,6 @@ export default function ChartPage() {
     setEditingIndex(null);
   };
 
-  const moveSignalUp = () => {
-    if (editingIndex !== null && editingIndex > 0) {
-      const newNameData = [...nameData];
-      const newSignalTypeData = [...signalType];
-      const newChartData = [...chartData];
-
-      // Swap with index - 1
-      [newNameData[editingIndex], newNameData[editingIndex - 1]] = [
-        newNameData[editingIndex - 1],
-        newNameData[editingIndex],
-      ];
-      [newSignalTypeData[editingIndex], newSignalTypeData[editingIndex - 1]] = [
-        newSignalTypeData[editingIndex - 1],
-        newSignalTypeData[editingIndex],
-      ];
-      [newChartData[editingIndex], newChartData[editingIndex - 1]] = [
-        newChartData[editingIndex - 1],
-        newChartData[editingIndex],
-      ];
-
-      setNameData(newNameData);
-      setSignalType(newSignalTypeData);
-      setChartData(newChartData);
-      setEditingIndex(editingIndex - 1);
-    }
-  };
-
-  const moveSignalDown = () => {
-    if (editingIndex !== null && editingIndex < nameData.length - 1) {
-      const newNameData = [...nameData];
-      const newSignalTypeData = [...signalType];
-      const newChartData = [...chartData];
-
-      // Swap with index + 1
-      [newNameData[editingIndex], newNameData[editingIndex + 1]] = [
-        newNameData[editingIndex + 1],
-        newNameData[editingIndex],
-      ];
-      [newSignalTypeData[editingIndex], newSignalTypeData[editingIndex + 1]] = [
-        newSignalTypeData[editingIndex + 1],
-        newSignalTypeData[editingIndex],
-      ];
-      [newChartData[editingIndex], newChartData[editingIndex + 1]] = [
-        newChartData[editingIndex + 1],
-        newChartData[editingIndex],
-      ];
-
-      setNameData(newNameData);
-      setSignalType(newSignalTypeData);
-      setChartData(newChartData);
-      setEditingIndex(editingIndex + 1);
-    }
-  };
-
-  const cancelNameEdit = () => {
-    setIsNameModalOpen(false);
-    setEditingIndex(null);
-  };
-
-  const saveScaleEdit = (period: number) => {
-    setIsScaleModalOpen(false);
-  };
-
-  const cancelScaleEdit = () => {
-    setIsScaleModalOpen(false);
-  };
-
   const handleChartMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = chartCanvasRef.current;
     if (!canvas) return;
@@ -415,7 +309,10 @@ export default function ChartPage() {
     const mouseY = event.clientY - rect.top;
 
     const col = Math.floor(mouseX / CELL_WIDTH);
-    const row = Math.floor(mouseY / CELL_HEIGHT);
+    const row = Math.floor((mouseY - CELL_HEIGHT) / CELL_HEIGHT);
+
+    // TODO: out of bounds : chart folding
+    if (row < 0 || row >= chartData.length) return;
 
     // 新規値を設定
     const newData = [...chartData];
@@ -441,51 +338,6 @@ export default function ChartPage() {
     setStatus(`クリック位置: 列 ${col}, 行 ${row}, 値: ${newData[row][col]}`);
   };
 
-  const handleSave = async () => {
-    const data = {
-      nameData,
-      signalType,
-      chartData,
-    };
-    try {
-      const result = await (window as any).electron.saveJson(data);
-      if (result.success) {
-        setStatus("保存しました");
-      } else if (result.error) {
-        setStatus(`保存に失敗しました: ${result.error}`);
-      }
-    } catch (e) {
-      console.error(e);
-      setStatus("保存エラー");
-    }
-  };
-
-  const handleLoad = async () => {
-    try {
-      const result = await (window as any).electron.loadJson();
-      if (result.success && result.data) {
-        const validatedChartData = result.data.chartData.map(
-          (row: ChartData[]) => {
-            if (row.length === 0 || row[row.length - 1] !== "") {
-              return [...row, ""];
-            }
-            return row;
-          }
-        );
-
-        setNameData(result.data.nameData);
-        setSignalType(result.data.signalType);
-        setChartData(validatedChartData);
-        setStatus("読み込みました");
-      } else if (result.error) {
-        setStatus(`読み込みに失敗しました: ${result.error}`);
-      }
-    } catch (e) {
-      console.error(e);
-      setStatus("読み込みエラー");
-    }
-  };
-
   return (
     <Layout title="Timing Chart Grid">
       <div
@@ -494,48 +346,11 @@ export default function ChartPage() {
           flexDirection: "column",
           alignItems: "center",
           padding: "20px",
-          fontFamily: "sans-serif",
+          fontFamily: "SourceHanCodeJP-Normal",
           backgroundColor: "#f0f0f0",
           minHeight: "calc(100vh - 64px)", // Adjust for layout header if needed
         }}
       >
-        <div
-          style={{
-            marginBottom: "10px",
-            display: "flex",
-            gap: "10px",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <div style={{ fontWeight: "bold", flexGrow: 1 }}>{status}</div>
-          <button
-            onClick={handleSave}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              backgroundColor: "#28a745",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Save JSON
-          </button>
-          <button
-            onClick={handleLoad}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              backgroundColor: "#17a2b8",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Load JSON
-          </button>
-        </div>
         <div
           style={{
             display: "grid",
@@ -543,13 +358,13 @@ export default function ChartPage() {
             gridTemplateRows: "max-content 2fr",
             alignItems: "start",
             padding: "20px",
-            fontFamily: "sans-serif",
+            fontFamily: "SourceHanCodeJP-Normal",
             backgroundColor: "#f0f0f0",
             width: "100%",
           }}
         >
           <div />
-          <div
+          {/* <div
             style={{
               overflowX: "hidden",
               overflowY: "hidden",
@@ -560,10 +375,10 @@ export default function ChartPage() {
             <canvas
               ref={scaleCanvasRef}
               width={scaleWidth}
-              height={scaleHeight}
+              height={CELL_HEIGHT}
               onMouseDown={handleScaleMouseDown}
             />
-          </div>
+          </div> */}
           <div
             style={{
               overflowX: "hidden",
@@ -572,12 +387,42 @@ export default function ChartPage() {
               gridRow: "2 / 3",
             }}
           >
-            <canvas
-              ref={nameCanvasRef}
-              width={nameWidth}
-              height={nameHeight}
-              onMouseDown={handleNameMouseDown}
-            />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                // gridTemplateColumns: "max-content 2fr",
+                // gridTemplateRows: "max-content 2fr",
+                // alignItems: "start",
+                // padding: "20px",
+                // fontFamily: "sans-serif",
+                // backgroundColor: "#f0f0f0",
+                // width: "100%",
+              }}
+            >
+              <canvas
+                ref={nameCanvasRef}
+                width={nameWidth}
+                height={chartHeight}
+                onMouseDown={handleNameMouseDown}
+              />
+              <button
+                onClick={addNewSignal}
+                style={{
+                  padding: "8px 14px 8px 14px",
+                  margin: "8px",
+                  borderRadius: "4px",
+                  width: "80px",
+                  border: "1px solid #ccc",
+                  backgroundColor: "#fe5884ff",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                ADD
+              </button>
+            </div>
           </div>
           <div
             style={{
@@ -600,243 +445,23 @@ export default function ChartPage() {
             />
           </div>
         </div>
-        <button
-          onClick={addNewSignal}
-          style={{
-            padding: "8px 16px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-            backgroundColor: "#fe5884ff",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          Add New Signal
-        </button>
       </div>
       {isNameModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              minWidth: "300px",
-            }}
-          >
-            <h3 style={{ marginTop: 0 }}>Edit Signal Name</h3>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "16px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  marginRight: "8px",
-                }}
-              >
-                <button
-                  onClick={moveSignalUp}
-                  disabled={editingIndex === 0}
-                  style={{
-                    marginBottom: "2px",
-                    cursor: "pointer",
-                    padding: "2px 6px",
-                  }}
-                >
-                  ▲
-                </button>
-                <button
-                  onClick={moveSignalDown}
-                  disabled={editingIndex === nameData.length - 1}
-                  style={{ cursor: "pointer", padding: "2px 6px" }}
-                >
-                  ▼
-                </button>
-              </div>
-              <input
-                type="text"
-                value={editingNameValue}
-                onChange={(e) => setNameEditingValue(e.target.value)}
-                style={{
-                  flexGrow: 1,
-                  padding: "8px",
-                  boxSizing: "border-box",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                }}
-                autoFocus
-              />
-            </div>
-
-            <h3 style={{ marginTop: 0 }}>Edit Signal Type</h3>
-            <select
-              value={editingSignalTypeValue}
-              onChange={(e) =>
-                setEditingSignalTypeValue(e.target.value as SignalType)
-              }
-              style={{
-                width: "100%",
-                padding: "8px",
-                marginBottom: "16px",
-                boxSizing: "border-box",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
-            >
-              <option value="data">Data</option>
-              <option value="clock">Clock</option>
-            </select>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "8px",
-              }}
-            >
-              <button
-                onClick={deleteSignal}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  border: "none",
-                  backgroundColor: "#ff0051ff",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              >
-                Delete Signal
-              </button>
-              <button
-                onClick={cancelNameEdit}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fff",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveNameEdit}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  border: "none",
-                  backgroundColor: "#007bff",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {isScaleModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              minWidth: "300px",
-            }}
-          >
-            <h3 style={{ marginTop: 0 }}>Edit Signal Name</h3>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "16px",
-              }}
-            >
-              <input
-                type="number"
-                min={1}
-                step={1}
-                value={period}
-                onChange={(e) => setPeriod(Number(e.target.value))}
-                style={{
-                  flexGrow: 1,
-                  padding: "8px",
-                  boxSizing: "border-box",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                }}
-                autoFocus
-              />
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "8px",
-              }}
-            >
-              <button
-                onClick={cancelScaleEdit}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#fff",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveScaleEdit}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  border: "none",
-                  backgroundColor: "#007bff",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
+        <NameModal
+          nameData={nameData}
+          setNameData={setNameData}
+          signalType={signalType}
+          setSignalType={setSignalType}
+          chartData={chartData}
+          setChartData={setChartData}
+          setIsNameModalOpen={setIsNameModalOpen}
+          editingIndex={editingIndex}
+          setEditingIndex={setEditingIndex}
+          editingNameValue={editingNameValue}
+          setNameEditingValue={setNameEditingValue}
+          editingSignalTypeValue={editingSignalTypeValue}
+          setEditingSignalTypeValue={setEditingSignalTypeValue}
+        />
       )}
     </Layout>
   );

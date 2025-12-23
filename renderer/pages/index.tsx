@@ -6,40 +6,40 @@ import { Button } from "@mui/material";
 import { LinkButton } from "../components/LinkButton";
 import ModalComponent from "./ModalComponent";
 
-const IndexPage = () => {
-  // useEffect(() => {
-  //   const handleMessage = (_event, args) => alert(args);
+// const IndexPage = () => {
+//   // useEffect(() => {
+//   //   const handleMessage = (_event, args) => alert(args);
 
-  //   // listen to the 'message' channel
-  //   window.electron.receiveHello(handleMessage);
+//   //   // listen to the 'message' channel
+//   //   window.electron.receiveHello(handleMessage);
 
-  //   return () => {
-  //     window.electron.stopReceivingHello(handleMessage);
-  //   };
-  // }, []);
+//   //   return () => {
+//   //     window.electron.stopReceivingHello(handleMessage);
+//   //   };
+//   // }, []);
 
-  // const onSayHiClick = () => {
-  //   window.electron.sayHello();
-  // };
+//   // const onSayHiClick = () => {
+//   //   window.electron.sayHello();
+//   // };
 
-  return (
-    <Layout title="Home | Timing chart editor">
-      {/* <h1>Hello Next.js 👋</h1>
-      <Button onClick={onSayHiClick}>Say hi to electron</Button>
-      <p>
-        <Link href="/about">About</Link>
-      </p> */}
-      {/* <LinkButton href="/editor">
-        RESTORE
-      </LinkButton>
-      <LinkButton href="/editor">
-        NEW CREATE
-      </LinkButton> */}
-      <LinkButton href="/chart">CHART</LinkButton>
-      {/* <ModalComponent buttonLabel="Open Modal" /> */}
-    </Layout>
-  );
-};
+//   return (
+//     <Layout title="Home | Timing chart editor">
+//       {/* <h1>Hello Next.js 👋</h1>
+//       <Button onClick={onSayHiClick}>Say hi to electron</Button>
+//       <p>
+//         <Link href="/about">About</Link>
+//       </p> */}
+//       {/* <LinkButton href="/editor">
+//         RESTORE
+//       </LinkButton>
+//       <LinkButton href="/editor">
+//         NEW CREATE
+//       </LinkButton> */}
+//       <LinkButton href="/chart">CHART</LinkButton>
+//       {/* <ModalComponent buttonLabel="Open Modal" /> */}
+//     </Layout>
+//   );
+// };
 
 // export default IndexPage;
 

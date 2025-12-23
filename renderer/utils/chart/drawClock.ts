@@ -4,11 +4,9 @@ let patternSource: HTMLCanvasElement | null = null;
 
 export const drawClockCell0 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -22,11 +20,9 @@ export const drawClockCell0 = (
 
 export const drawClockCell1 = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   ctx.strokeStyle = "#0055ff";
   ctx.setLineDash([]);
@@ -44,11 +40,9 @@ export const drawClockCell1 = (
 
 export const drawClockCellx = (
   ctx: CanvasRenderingContext2D,
-  col: number,
-  row: number
+  x: number,
+  y: number
 ) => {
-  const x = col * CELL_WIDTH;
-  const y = row * CELL_HEIGHT;
 
   // 斜線パターンの作成
   if (!patternSource) {
