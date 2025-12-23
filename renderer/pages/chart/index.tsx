@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Layout from "../../components/Layout";
+import { Button } from "../../components/Button";
 import { NextPage } from "next/types";
 import { NameModal } from "../../components/chart/NameModal";
 
@@ -224,6 +224,51 @@ export default function ChartPage() {
 
   const chartHeight = CELL_HEIGHT * chartData.length + CELL_HEIGHT;
 
+  const handleSave = async () => {
+    const data = {
+      nameData,
+      signalType,
+      chartData,
+    };
+    try {
+      const result = await (window as any).electron.saveJson(data);
+      if (result.success) {
+        // setStatus("保存しました");
+      } else if (result.error) {
+        // setStatus(`保存に失敗しました: ${result.error}`);
+      }
+    } catch (e) {
+      console.error(e);
+      // setStatus("保存エラー");
+    }
+  };
+
+  const handleLoad = async () => {
+    try {
+      const result = await (window as any).electron.loadJson();
+      if (result.success && result.data) {
+        const validatedChartData = result.data.chartData.map(
+          (row: ChartData[]) => {
+            if (row.length === 0 || row[row.length - 1] !== "") {
+              return [...row, ""];
+            }
+            return row;
+          }
+        );
+
+        setNameData(result.data.nameData);
+        setSignalType(result.data.signalType);
+        setChartData(validatedChartData);
+        setStatus("読み込みました");
+      } else if (result.error) {
+        // setStatus(`読み込みに失敗しました: ${result.error}`);
+      }
+    } catch (e) {
+      console.error(e);
+      // setStatus("読み込みエラー");
+    }
+  };
+
   useEffect(() => {
     const canvas = chartCanvasRef.current;
     if (!canvas) return;
@@ -338,7 +383,58 @@ export default function ChartPage() {
   };
 
   return (
-    <Layout title="Timing Chart Grid">
+    <div>
+      <header>
+        <nav>
+          {/* <Link href="/">Home</Link> | <Link href="/about">About</Link> |{" "} */}
+          {/* <Link href="/initial-props">With Initial Props</Link> */}
+          <div
+            style={{
+              // marginBottom: "10px",
+              // marginRight: "10px",
+              // marginLeft: "10px",
+              display: "flex",
+              gap: "10px",
+              alignItems: "center",
+              backgroundColor: "#333",
+              color: "white",
+              padding: "10px",
+              borderRadius: "4px",
+              // margin: "10px ",
+            }}
+          >
+            Timing Chart Editor
+            <Button
+              onClick={handleSave}
+              style={{
+                marginLeft: "auto",
+                padding: "8px 14px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+                backgroundColor: "#28a745",
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Save JSON
+            </Button>
+            <Button
+              onClick={handleLoad}
+              style={{
+                marginRight: "20px",
+                padding: "8px 14px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+                backgroundColor: "#17a2b8",
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Load JSON
+            </Button>
+          </div>
+        </nav>
+      </header>
       <div
         style={{
           display: "flex",
@@ -533,6 +629,6 @@ export default function ChartPage() {
           setEditingSignalTypeValue={setEditingSignalTypeValue}
         />
       )}
-    </Layout>
+    </div>
   );
 }

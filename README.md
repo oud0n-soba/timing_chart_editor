@@ -19,8 +19,22 @@
 - **Electron**: Desktop application framework.
 - **Next.js**: React framework for the renderer process.
 - **TypeScript**: Static typing for better code quality.
-- **Rent-Konva**: Canvas library for drawing charts.
+- **React-Konva**: Canvas library for drawing charts.
 - **Material UI**: UI component library.
+
+### Usage
+
+#### Data Editing
+
+![edit](./doc/edit.gif)
+
+#### Adding Signals
+
+![add](./doc/add.gif)
+
+#### Save & Load
+
+![save](./doc/save_load.gif)
 
 ### Getting Started
 
@@ -88,7 +102,21 @@ npm run build-win
 - **React-Konva**: チャート描画用の Canvas ライブラリ。
 - **Material UI**: UI コンポーネントライブラリ。
 
-### 始め方
+### 使い方
+
+#### データの編集
+
+![edit](./doc/edit.gif)
+
+#### 信号の追加
+
+![add](./doc/add.gif)
+
+#### 保存・読み込み
+
+![save](./doc/save_load.gif)
+
+### 開発環境の構築
 
 #### 前提条件
 
