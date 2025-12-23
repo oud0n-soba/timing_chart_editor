@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-// import Layout from "../../components/Layout";
-import Layout from "./Layout";
+import Layout from "../../components/Layout";
 import { NextPage } from "next/types";
-import { NameModal } from "../../utils/chart/NameModal";
+import { NameModal } from "../../components/chart/NameModal";
 
 import { CELL_HEIGHT, CELL_WIDTH } from "../../utils/chart/variable";
 import {
